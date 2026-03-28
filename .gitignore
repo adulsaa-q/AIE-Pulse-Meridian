@@ -1,0 +1,6 @@
+ .DS_Store
+        .gitignore
+        __pycache__/
+        config.py
+        files/
+        plugins/
