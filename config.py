@@ -27,3 +27,8 @@ GEMINI_MODEL     = "gemini-2.5-flash"
 SCHEDULE_HOUR    = 8
 SCHEDULE_MINUTE  = 0
 DB_PATH          = "data/signals.db"
+# -----------------------------
+# API OpenRouter
+# -----------------------------
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_MODEL   = "stepfun/step-3.5-flash:free"
