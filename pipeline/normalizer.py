@@ -7,7 +7,7 @@ def save(records: list[dict]):
     รับ records จาก plugin ต่างๆ แล้วเก็บลง SQLite
     ตรวจสอบว่าทุก record ตรงกับ Universal Schema ก่อนบันทึก
     """
-    conn = sqlite3.connect(config.DB_PATH)
+    with sqlite3.connect(config.DB_PATH) as conn:
     cursor = conn.cursor()
     # crate table if not exists 
     cursor.execute("""
@@ -35,7 +35,6 @@ def save(records: list[dict]):
             record.get("source")
         ))
     conn.commit()
-    conn.close()
     
 def export_sample_csv() -> None:
     """ส่งออก 20 records ล่าสุดจาก SQLite เป็น CSV ตัวอย่าง"""
