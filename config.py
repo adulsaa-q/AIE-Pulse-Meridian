@@ -38,8 +38,15 @@ REPORT_OUTPUT_DIR    = "reports/"
 REPORT_LANGUAGE      = "Thai"
 GEMINI_API_KEY       = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL         = "gemini-2.5-flash"
+#-------------------------------------------
+# API KEYS & CONFIG
 OPENROUTER_API_KEY   = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_MODEL     = "stepfun/step-3.5-flash:free"
+#-------------------------------------------
+# Models AI
+#OPENROUTER_MODEL     = "stepfun/step-3.5-flash:free"
+#OPENROUTER_MODEL     = "google/gemini-2.0-flash-exp:free"
+OPENROUTER_MODEL     = "openrouter/free"
+#-------------------------------------------
 SCHEDULE_HOUR        = 8
 SCHEDULE_MINUTE      = 0
 
