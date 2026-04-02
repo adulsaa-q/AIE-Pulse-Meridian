@@ -3,37 +3,41 @@ from datetime import datetime
 import config
 
 def collect() -> list[dict]:
-    records = []
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    """ดึงข่าวจาก RSS feeds แล้วนับจำนวน mention ของ BRANDS และ KEYWORDS ต่อวัน"""
+    today = datetime.now().strftime("%Y-%m-%d")
+    counts = {}  # (entity, metric_name) -> จำนวน mention รวมทุก feed
+
     for feed_url in config.RSS_FEEDS:
         try:
             feed = feedparser.parse(feed_url)
             for entry in feed.entries:
                 title = entry.get("title", "").lower()
-                
+
                 # 1. เช็คชื่อแบรนด์ (Company Level)
                 for brand in config.BRANDS:
                     if brand.lower() in title:
-                        records.append({
-                            "date": now,
-                            "entity": brand,
-                            "metric_name": "news_mentions", # ระบุว่าเป็นข่าวของแบรนด์
-                            "metric_value": 1.0,
-                            "dimension": feed_url,
-                            "source": "news_rss"
-                        })
-                
+                        key = (brand, "news_mentions")  # ระบุว่าเป็นข่าวของแบรนด์
+                        counts[key] = counts.get(key, 0) + 1
+
                 # 2. เช็คปัจจัยตลาด (Market Level)
                 for keyword in config.KEYWORDS:
                     if keyword.lower() in title:
-                        records.append({
-                            "date": now,
-                            "entity": keyword, # บันทึกเป็นคำสำคัญ
-                            "metric_name": "market_signals", # ระบุว่าเป็นสัญญาณตลาด
-                            "metric_value": 1.0,
-                            "dimension": feed_url,
-                            "source": "news_rss"
-                        })
+                        key = (keyword, "market_signals")  # ระบุว่าเป็นสัญญาณตลาด
+                        counts[key] = counts.get(key, 0) + 1
+
         except Exception as e:
-            print(f"\n [ERROR] news_rss: {feed_url} --> {e}")
+            print(f"[ERROR] news_rss: {feed_url} --> {e}")
+
+    # รวม count ต่อ entity+metric เป็น 1 record ต่อวัน (ป้องกันข้อมูลซ้ำเมื่อรันหลายรอบ)
+    records = []
+    for (entity, metric_name), count in counts.items():
+        records.append({
+            "date": today,
+            "entity": entity,
+            "metric_name": metric_name,
+            "metric_value": float(count),
+            "dimension": "RSS",
+            "source": "news_rss"
+        })
+
     return records

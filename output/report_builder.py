@@ -1,9 +1,10 @@
 import os
+import html
 import config
 from datetime import datetime
 
-def build(insights: list[dict] )-> str:
-    "รับ insights เพื่อสร้าง HTML report บันทึกลงไฟล์"
+def build(insights: list[dict]) -> str:
+    """รับ insights เพื่อสร้าง HTML report และบันทึกลงไฟล์"""
     os.makedirs(config.REPORT_OUTPUT_DIR, exist_ok=True)
     today = datetime.now().strftime("%Y-%m-%d")
     filename = f"{config.REPORT_OUTPUT_DIR}{config.USE_CASE}_{today}.html"
@@ -11,13 +12,17 @@ def build(insights: list[dict] )-> str:
     rows = ""
     for insight in insights:
         signal = insight.get("signal_type", "")
+        entity    = html.escape(str(insight['entity']))
+        metric    = html.escape(str(insight['metric_name']))
+        insight_text = html.escape(str(insight['insight']))
+        rec       = html.escape(str(insight.get('recommendation', '')))
         rows += f"""
         <div class="card">
-            <h2>{insight['entity']} <span style="font-size: 14px; color: #666; font-weight: normal;">({insight['metric_name']})</span></h2>
+            <h2>{entity} <span style="font-size: 14px; color: #666; font-weight: normal;">({metric})</span></h2>
             <span class="badge {signal}">{signal}</span>
             <div class="pct">{insight.get('pct_change', 'N/A')}%</div>
-            <pre>{insight['insight']}</pre>
-            <div class="rec">{insight.get('recommendation', '')}</div>
+            <pre>{insight_text}</pre>
+            <div class="rec">{rec}</div>
         </div>
         """
     html = f"""<!DOCTYPE html>
