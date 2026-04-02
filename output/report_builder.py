@@ -102,7 +102,7 @@ def build(insights: list[dict] )-> str:
 <body>
 <div class="container">
     <div class="header">
-        <h1>🧠 AIE Daily Intelligence Report</h1>
+        <h1>AIE Daily Intelligence Report</h1>
         <p>📅 {today} &nbsp;|&nbsp; 🎯 {config.USE_CASE} &nbsp;|&nbsp; ⚙️ {config.STRATEGY_MODE}</p>
     </div>
     {rows}
