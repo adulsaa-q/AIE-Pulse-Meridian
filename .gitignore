@@ -3,5 +3,7 @@
 __pycache__/
 data/
 *.db
-files/
+reports/
 .vscode/
+*.csv
+seed_mock_data.py

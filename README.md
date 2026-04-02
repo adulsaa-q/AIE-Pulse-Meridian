@@ -1,27 +1,134 @@
-# AIE-Pulse-Meridian
+# 🧠 AIE — Adaptive Intelligence Engine
 
-ลำดับการทำงาน (Data Pipeline) ตั้งแต่ต้นน้ำถึงปลายน้ำให้ฟังง่ายๆ แบบนี้นะครับ:
+> **Automated Market Signal Detection & AI-Powered Business Intelligence**
 
-1. ฝ่ายสอดแนม (Data Collection)
+ระบบ pipeline อัตโนมัติที่ดึงข้อมูลจากหลายแหล่ง ตรวจจับสัญญาณสำคัญ และให้ AI วิเคราะห์ insight เพื่อช่วยผู้บริหารตัดสินใจ
 
-news_rss.py: คอยไปอ่านพาดหัวข่าวจากสำนักข่าวต่างๆ ว่ามีใครพูดถึงแบรนด์เราหรือคู่แข่งบ้าง
+---
 
-google_trends.py: ไปดูยอดค้นหาใน Google ว่าช่วงนี้คนสนใจค้นหาชื่อแบรนด์ไหนเยอะเป็นพิเศษ
+## 🎯 Use Case แรก — Energy Sector Intelligence
 
-2. ฝ่ายจัดเก็บข้อมูล (Data Storage)
+ติดตาม PTT, SPRC, BAFS, บางจาก, ไทยออยล์ และราคาน้ำมันดิบ โดยเปรียบเทียบกับ baseline 7 วันย้อนหลัง แล้วสรุป insight ออกมาเป็น HTML report รายวัน
 
-normalizer.py: รับข้อมูลที่ได้จากฝ่ายสอดแนม มาจัดระเบียบให้อยู่ในฟอร์แมตเดียวกัน (Universal Schema) แล้วเก็บลงฐานข้อมูล (energy_sector.db) เพื่อไม่ให้ข้อมูลสะเปะสะปะ
+---
 
-3. ฝ่ายวิเคราะห์สถิติ (Signal Detection)
+## ⚙️ Architecture — 6 Layer Pipeline
+```
+Data Source Plugin  →  Normalization  →  Signal Detection
+                                               ↓
+Decision Output    ←  Strategy Engine  ←  Insight AI
+```
 
-signal_detector.py: จะเอาข้อมูลในฐานข้อมูลมาดูย้อนหลัง 7 วัน เพื่อหาว่ามีอะไร "ผิดปกติ" ไหม เช่น ข่าวของ PTT จู่ๆ พุ่งกระโดดเกิน 20% (ACCELERATION) หรือยอดค้นหาของ BAFS ร่วงหนัก (DECLINE) ถ้าเจอสัญญาณพวกนี้ ระบบจะคัดออกมาเพื่อวิเคราะห์ต่อ
+| Layer | ไฟล์ | หน้าที่ |
+|---|---|---|
+| 1. Data Source | `plugins/` | ดึงข้อมูลจาก Google Trends + RSS Feed |
+| 2. Normalization | `pipeline/normalizer.py` | แปลง → Universal Schema → SQLite |
+| 3. Signal Detection | `pipeline/signal_detector.py` | เปรียบเทียบ baseline → ACCELERATION / DECLINE |
+| 4. Insight AI | `engine/insight_ai.py` | ส่งให้ AI วิเคราะห์ผ่าน OpenRouter |
+| 5. Strategy Engine | `engine/strategy.py` | ปรับ recommendation ตาม strategy mode |
+| 6. Decision Output | `output/report_builder.py` | สร้าง HTML report |
 
-4. ฝ่ายที่ปรึกษาเชิงกลยุทธ์ (AI Insights & Strategy)
+---
 
-insight_ai.py: ส่งข้อมูลที่ผิดปกตินั้นไปให้ AI ระดับซีเนียร์วิเคราะห์ต่อ ว่าไอ้ตัวเลขที่พุ่งขึ้นหรือตกลงเนี่ย มันเกิดจากอะไร แล้วมีผลกระทบกับธุรกิจอย่างไรบ้าง
+## 🚀 Quick Start
 
-strategy.py: แนบคำแนะนำลงไปว่า จากสถานการณ์นี้และแผนปัจจุบันของบริษัท (เช่น ตอนนี้เราเน้น Growth) เราควร "ลุยต่อ", "เฝ้าระวัง" หรือ "ปรับกระบวนการ"
+### 1. Clone และติดตั้ง
+```bash
+git clone https://github.com/adulsaa-q/AIE-Pulse-Meridian.git
+cd AIE-Pulse-Meridian
+pip install -r requirements.txt
+```
 
-5. ฝ่ายออกรายงาน (Reporting)
+### 2. ตั้งค่า API Key
 
-report_builder.py: เอาข้อมูลที่วิเคราะห์เสร็จทั้งหมดมาจัดหน้าเป็นรายงาน HTML สวยๆ ดูง่ายๆ พร้อมให้ผู้บริหารเปิดอ่านเพื่อตัดสินใจได้ทันทีในทุกเช้า
+สร้างไฟล์ `.env` แล้วใส่
+```
+OPENROUTER_API_KEY=your-key-here
+```
+
+สมัคร API key ฟรีได้ที่ [openrouter.ai](https://openrouter.ai) ไม่ต้องบัตรเครดิต
+
+### 3. ตั้งค่า Use Case
+
+เปิด `config.py` แล้วแก้
+```python
+USE_CASE = "energy_sector"   # ชื่อ database
+BRANDS   = ["PTT", "SPRC"]  # แบรนด์ที่ต้องการติดตาม
+KEYWORDS = ["ราคาน้ำมัน"]   # keyword ตลาด
+```
+
+### 4. รันระบบ
+```bash
+python main.py
+```
+
+เปิด HTML report ที่สร้างขึ้นใน `reports/` ด้วย browser ได้เลย
+
+---
+
+## 📊 Signal Types
+
+| Signal | ความหมาย | เกณฑ์ |
+|---|---|---|
+| ACCELERATION | ความสนใจพุ่งสูงขึ้น | > +20% จาก baseline |
+| DECLINE | ความสนใจลดลง | < -20% จาก baseline |
+| ANOMALY | ผิดปกติ | เบี่ยงเบนจาก baseline |
+
+---
+
+## 🛠️ Tech Stack
+
+| Tool | หน้าที่ | ค่าใช้จ่าย |
+|---|---|---|
+| Python 3.11+ | Core language | ฟรี |
+| pytrends | Google Trends API | ฟรี |
+| feedparser | RSS Feed parser | ฟรี |
+| SQLite | Local database | ฟรี |
+| OpenRouter | AI API Gateway | ฟรี |
+| pandas | Data processing | ฟรี |
+
+**ค่าใช้จ่ายรวม: 0 บาท**
+
+---
+
+## 📁 Project Structure
+```
+AIE-Pulse-Meridian/
+├── plugins/
+│   ├── google_trends.py    # Layer 1: ดึง search volume
+│   └── news_rss.py         # Layer 1: ดึงข่าวจาก RSS
+├── pipeline/
+│   ├── normalizer.py       # Layer 2: เก็บลง SQLite
+│   └── signal_detector.py  # Layer 3: หา signals
+├── engine/
+│   ├── insight_ai.py       # Layer 4: AI วิเคราะห์
+│   └── strategy.py         # Layer 5: ปรับ recommendation
+├── output/
+│   └── report_builder.py   # Layer 6: สร้าง HTML report
+├── config.py               # ตั้งค่าทั้งระบบ
+├── main.py                 # รันทุก layer ด้วยคำสั่งเดียว
+└── requirements.txt
+```
+
+---
+
+## 💡 เปลี่ยน Use Case ได้ทันที
+
+ระบบนี้ไม่ผูกกับอุตสาหกรรมใด — แค่แก้ `config.py` บรรทัดเดียว
+```python
+# ติดตามธนาคาร
+USE_CASE = "banking"
+BRANDS   = ["SCB", "Kbank", "TTB"]
+
+# ติดตาม Food Delivery
+USE_CASE = "food_delivery"
+BRANDS   = ["Grab", "LINE MAN", "foodpanda"]
+```
+
+แต่ละ Use Case จะมี database แยกกันอัตโนมัติ
+
+---
+
+## 👤 Author
+
+**Q** — Data Analyst | [GitHub](https://github.com/adulsaa-q)
