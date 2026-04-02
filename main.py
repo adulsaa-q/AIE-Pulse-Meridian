@@ -31,6 +31,6 @@ def main():
     export_sample_csv()
 
     print(f"✅ Done! Report saved: {filename}")
-    if __name__ == "__main__":
-        main()
-    
+
+if __name__ == "__main__":
+    main()

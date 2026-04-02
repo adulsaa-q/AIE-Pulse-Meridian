@@ -13,7 +13,7 @@ def build(insights: list[dict] )-> str:
         signal = insight.get("signal_type", "")
         rows += f"""
         <div class="card">
-            <h2>{insight['entity']}</h2>
+            <h2>{insight['entity']} <span style="font-size: 14px; color: #666; font-weight: normal;">({insight['metric_name']})</span></h2>
             <span class="badge {signal}">{signal}</span>
             <div class="pct">{insight.get('pct_change', 'N/A')}%</div>
             <pre>{insight['insight']}</pre>
