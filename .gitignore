@@ -7,3 +7,4 @@ reports/
 .vscode/
 *.csv
 seed_mock_data.py
+reports/
