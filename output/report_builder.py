@@ -25,7 +25,7 @@ def build(insights: list[dict]) -> str:
             <div class="rec">{rec}</div>
         </div>
         """
-    html = f"""<!DOCTYPE html>
+    html_content = f"""<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -115,6 +115,6 @@ def build(insights: list[dict]) -> str:
 </body>
 </html>"""
     with open(filename, "w", encoding="utf-8") as f:
-        f.write(html)
+        f.write(html_content)
 
     return filename
