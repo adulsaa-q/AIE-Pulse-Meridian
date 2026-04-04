@@ -1,85 +1,211 @@
 # 🧠 AIE — Adaptive Intelligence Engine
 
-> Automated Market Signal Detection & AI-Powered Business Intelligence
+> **Automated Market Signal Detection & AI-Powered Business Intelligence**
 
-ระบบ pipeline อัตโนมัติที่ดึงข้อมูลจากหลายแหล่ง ตรวจจับสัญญาณที่มีนัยสำคัญ และให้ AI วิเคราะห์ insight เพื่อสนับสนุนการตัดสินใจเชิงธุรกิจ
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)
+![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey?logo=sqlite)
+![OpenRouter](https://img.shields.io/badge/AI-OpenRouter-ff6b35)
+![Status](https://img.shields.io/badge/Status-Experimental-yellow)
+
+AIE (Adaptive Intelligence Engine) is an experimental data intelligence pipeline designed to automatically detect meaningful market signals and transform fragmented external data into structured business insights.
+
+Market monitoring is typically manual and reactive. Important signals are often discovered *after* market sentiment has already shifted. This project was built to answer a core question:
+
+> **Can early market signals be detected automatically — before humans notice them?**
 
 ---
 
-## Use Case แรก — Energy Sector
+## 📋 Table of Contents
 
-ติดตาม **PTT · SPRC · BAFS · บางจาก · ไทยออยล์** พร้อม keyword ตลาด เช่น ราคาน้ำมันดิบ และ OPEC โดยเปรียบเทียบกับ baseline 7 วันย้อนหลัง แล้วสรุปออกมาเป็น HTML report รายวัน
+- [Project Goal](#-project-goal)
+- [Architecture](#️-how-it-works-architecture)
+- [Design Philosophy](#-design-philosophy)
+- [Initial Use Case](#-initial-use-case--energy-sector)
+- [Project Structure](#-project-structure)
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Seamless Scalability](#-seamless-scalability-change-industries-instantly)
+- [Tech Stack](#-tech-stack)
+- [Project Outcomes](#-project-outcomes)
+- [Sample Output](#-sample-output)
+- [Disclaimer](#-disclaimer)
 
 ---
 
-## Architecture
-```
-plugins/   →   pipeline/   →   engine/   →   output/
-(collect)      (normalize)     (AI)          (report)
-```
+## 🎯 Project Goal
 
-| # | Layer | ไฟล์ | หน้าที่ |
+The objective of AIE is to simulate an **automated intelligence analyst** capable of:
+
+- Continuously monitoring external market signals
+- Detecting statistically significant behavioral changes
+- Converting raw information into structured insights
+- Producing decision-ready reports automatically
+
+Instead of replacing analysts, the system **reduces monitoring overhead** and highlights where human attention should focus.
+
+---
+
+## ⚙️ How It Works (Architecture)
+
+The system automates the full intelligence pipeline, separating data collection, analysis, and decision logic into independent layers:
+
+| # | Layer | File | Responsibility |
 |---|---|---|---|
-| 1 | Data Source | `plugins/google_trends.py` | Search volume จาก Google Trends |
-| 1 | Data Source | `plugins/news_rss.py` | ข่าวจาก RSS Feed |
-| 2 | Normalization | `pipeline/normalizer.py` | Universal Schema → SQLite |
-| 3 | Signal Detection | `pipeline/signal_detector.py` | เปรียบเทียบ baseline → signal type |
-| 4 | Insight AI | `engine/insight_ai.py` | วิเคราะห์ผ่าน OpenRouter |
-| 5 | Strategy Engine | `engine/strategy.py` | ปรับ recommendation ตาม mode |
-| 6 | Decision Output | `output/report_builder.py` | สร้าง HTML report |
+| 1 | **Data Source** | `plugins/google_trends.py`<br>`plugins/news_rss.py` | Collects search volume from Google Trends and news from RSS feeds |
+| 2 | **Normalization** | `pipeline/normalizer.py` | Converts heterogeneous data into a Universal Schema and stores it in SQLite |
+| 3 | **Signal Detection** | `pipeline/signal_detector.py` | Compares current activity against a rolling baseline to identify abnormal deviations |
+| 4 | **Insight AI** | `engine/insight_ai.py` | Interprets detected signals using OpenRouter AI (LLM) |
+| 5 | **Strategy Engine** | `engine/strategy.py` | Adjusts recommendations based on active operating mode |
+| 6 | **Decision Output** | `output/report_builder.py` | Generates a daily decision-ready HTML intelligence report |
+
+**Pipeline Flow:**
+
+```
+plugins/          →   pipeline/          →   engine/         →   output/
+(collect)             (normalize &            (reason &           (report)
+                       detect signals)         strategize)
+```
 
 ---
 
-## Quick Start
+## 🧠 Design Philosophy
 
-**1. Clone และติดตั้ง**
+AIE follows five engineering principles:
+
+**1. Separation of Concerns**
+Each layer performs one responsibility only — collection, normalization, reasoning, or reporting — allowing independent evolution.
+
+**2. Signal Over Data**
+Raw data is noisy. The system prioritizes detecting *change* rather than storing large volumes of information.
+
+**3. Configuration Over Hardcoding**
+Industries, brands, and monitoring targets are defined via configuration instead of code changes.
+
+**4. Analyst-Centric Output**
+Outputs are designed as readable intelligence reports rather than raw dashboards.
+
+**5. Lightweight Intelligence Architecture**
+Runs locally using simple components (Python + SQLite) while demonstrating scalable architectural concepts.
+
+---
+
+## 🧪 Initial Use Case — Energy Sector
+
+The first implementation monitors Thailand's energy ecosystem:
+
+- **Brands:** PTT, SPRC, BAFS, Bangchak, Thai Oil
+- **Keywords:** Crude oil prices, OPEC, Middle East conflict
+
+Energy markets were selected due to their sensitivity to geopolitical and macroeconomic sentiment.
+
+The system compares current activity against a **7-day rolling baseline** and highlights statistically significant deviations.
+
+### Signal Types
+
+| Signal | Meaning | Criteria |
+|---|---|---|
+| 🔴 `ACCELERATION` | Unusual spike in interest | > +20% from baseline |
+| 🔵 `DECLINE` | Continuous drop in interest | < −20% from baseline |
+| 🟡 `ANOMALY` | Deviation from normal patterns | Outside ± threshold |
+
+---
+
+## 📁 Project Structure
+
+```
+AIE-Pulse-Meridian/
+├── plugins/
+│   ├── google_trends.py      # Google Trends data collector
+│   └── news_rss.py           # RSS news feed collector
+├── pipeline/
+│   ├── normalizer.py         # Universal schema + SQLite storage
+│   └── signal_detector.py    # Rolling baseline & deviation detection
+├── engine/
+│   ├── insight_ai.py         # LLM-powered signal interpretation
+│   └── strategy.py           # Operating mode & recommendation logic
+├── output/
+│   └── report_builder.py     # HTML report generator
+├── sample_output/            # Example generated reports
+├── config.py                 # Use case configuration
+├── main.py                   # Pipeline entry point
+├── requirements.txt
+└── .env                      # API key (not committed)
+```
+
+---
+
+## 🔧 Prerequisites
+
+- Python 3.11+
+- A free [OpenRouter](https://openrouter.ai) API key (no credit card required)
+- Internet connection for data collection
+
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Clone and Install
+
 ```bash
 git clone https://github.com/adulsaa-q/AIE-Pulse-Meridian.git
 cd AIE-Pulse-Meridian
 pip install -r requirements.txt
 ```
 
-**2. สร้างไฟล์ `.env`**
-```
+### 2️⃣ Setup Environment
+
+Create a `.env` file in the project root:
+
+```env
 OPENROUTER_API_KEY=your-key-here
 ```
-สมัคร API key ฟรีได้ที่ [openrouter.ai](https://openrouter.ai) — ไม่ต้องบัตรเครดิต
 
-**3. ตั้งค่า Use Case ใน `config.py`**
+> Free API keys available at [https://openrouter.ai](https://openrouter.ai) — no credit card required.
+
+### 3️⃣ Configure Use Case (`config.py`)
+
 ```python
 USE_CASE = "energy_sector"
-BRANDS   = ["PTT", "SPRC", "BAFS", "บางจาก", "ไทยออยล์"]
-KEYWORDS = ["ราคาน้ำมันดิบ", "OPEC", "สงครามตะวันออกกลาง"]
+
+BRANDS = [
+    "PTT",
+    "SPRC",
+    "BAFS",
+    "บางจาก",
+    "ไทยออยล์"
+]
+
+KEYWORDS = [
+    "ราคาน้ำมันดิบ",
+    "OPEC",
+    "สงครามตะวันออกกลาง"
+]
 ```
 
-**4. รัน**
+### 4️⃣ Run the Pipeline
+
 ```bash
 python main.py
 ```
 
-Report จะถูกบันทึกไว้ใน `reports/` เปิดด้วย browser ได้เลย
+The generated HTML report will be saved in the `reports/` folder and can be opened directly in any web browser.
 
 ---
 
-## Signal Types
+## 🧩 Seamless Scalability (Change Industries Instantly)
 
-| Signal | ความหมาย | เกณฑ์ |
-|---|---|---|
-| `ACCELERATION` | ความสนใจพุ่งขึ้นผิดปกติ | > +20% จาก baseline |
-| `DECLINE` | ความสนใจลดลงต่อเนื่อง | < −20% จาก baseline |
-| `ANOMALY` | เบี่ยงเบนจากปกติ | ± นอก threshold |
+The system is **not hardcoded** to any specific industry.
 
----
+Changing sectors only requires updating `config.py`. Databases and baselines are automatically separated per use case.
 
-## เปลี่ยน Use Case ได้ทันที
-
-ระบบไม่ผูกกับอุตสาหกรรมใด — แค่แก้ `config.py` แล้วรันใหม่ database จะแยกกันอัตโนมัติ
 ```python
-# Banking
+# Banking Sector
 USE_CASE = "banking"
 BRANDS   = ["SCB", "Kbank", "TTB"]
 KEYWORDS = ["ดอกเบี้ย", "แบงก์ชาติ"]
+```
 
+```python
 # Food Delivery
 USE_CASE = "food_delivery"
 BRANDS   = ["Grab", "LINE MAN", "foodpanda"]
@@ -88,20 +214,49 @@ KEYWORDS = ["ส่งอาหาร", "โปรโมชั่น"]
 
 ---
 
-## Tech Stack
+## 🧰 Tech Stack
 
-`Python 3.11` · `pytrends` · `feedparser` · `pandas` · `SQLite` · `OpenRouter AI`
+| Tool | Purpose |
+|---|---|
+| Python 3.11 | Core runtime |
+| pandas | Data transformation |
+| pytrends | Google Trends API wrapper |
+| feedparser | RSS news collection |
+| SQLite | Lightweight local storage |
+| OpenRouter AI | LLM inference for signal interpretation |
 
-**ค่าใช้จ่าย: 0 บาท**
+Designed to run **locally** with minimal infrastructure requirements.
 
 ---
 
-## Sample Output
+## 📊 Project Outcomes
 
-ดูตัวอย่าง report ได้ที่ [`sample_output/`](sample_output/)
+This project demonstrates how an automated pipeline can:
+
+- ✅ Detect abnormal market attention early
+- ✅ Reduce manual monitoring workflows
+- ✅ Transform external signals into structured intelligence
+- ✅ Generate analyst-style insights automatically
+- ✅ Produce daily decision-support reports without human intervention
 
 ---
 
-## Author
+## 📄 Sample Output
 
-**Q** — Data Analyst · [GitHub](https://github.com/adulsaa-q)
+View generated reports inside:
+
+```
+sample_output/
+```
+
+Reports are exported as **standalone HTML files** for easy viewing and sharing — no additional software required.
+
+---
+
+## ⚠️ Disclaimer
+
+AIE is an **experimental research project** built for learning and portfolio purposes. Signal outputs should not be used as the sole basis for investment or business decisions. Always validate insights with additional sources and professional judgment.
+
+---
+
+*Built with curiosity. Powered by data.*
